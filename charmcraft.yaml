@@ -1,0 +1,95 @@
+# This file configures Charmcraft.
+# See https://documentation.ubuntu.com/charmcraft/stable/reference/files/charmcraft-yaml-file/ for guidance.
+# For questions or help, visit https://matrix.to/#/#12-factor-charms:ubuntu.com
+
+name: paas-fastapi-demo
+
+type: charm
+
+base: ubuntu@26.04
+
+# the platforms this charm should be built on and run on.
+# you can check your architecture with `dpkg --print-architecture`
+platforms:
+  amd64:
+  # arm64:
+  # ppc64el:
+  # s390x:
+
+# (Required)
+summary: A very short one-line summary of the FastAPI application.
+
+# (Required)
+description: |
+  A comprehensive overview of your FastAPI application.
+
+extensions:
+  - fastapi-framework
+
+# Uncomment the integrations used by your application
+# Integrations set to "optional: false" will block the charm
+# until the applications are integrated.
+# requires:
+#   mysql:
+#     interface: mysql_client
+#     optional: false
+#     limit: 1
+#   postgresql:
+#     interface: postgresql_client
+#     optional: false
+#     limit: 1
+#   mongodb:
+#     interface: mongodb_client
+#     optional: false
+#     limit: 1
+#   redis:
+#     interface: redis
+#     optional: false
+#     limit: 1
+#   valkey:
+#     interface: valkey_client
+#     optional: true
+#     limit: 1
+#   s3:
+#     interface: s3
+#     optional: false
+#     limit: 1
+#   saml:
+#     interface: saml
+#     optional: false
+#     limit: 1
+#   rabbitmq:
+#     interface: rabbitmq
+#     optional: false
+#     limit: 1
+#   tracing:
+#     interface: tracing
+#     optional: true
+#     limit: 1
+#   smtp:
+#     interface: smtp
+#     optional: false
+#     limit: 1
+#   openfga:
+#     interface: openfga
+#     optional: false
+#     limit: 1
+#   http-proxy:
+#     interface: http_proxy
+#     optional: true
+#     limit: 1
+
+# This field populates the Resources tab on Charmhub.
+# https://documentation.ubuntu.com/charmcraft/stable/reference/files/charmcraft-yaml-file/#resources
+resources:
+  # An OCI image resource for each container listed above.
+  # You may remove this if your charm will run without a workload sidecar container.
+  app-image:
+    type: oci-image
+    description: OCI image for the 'app-image' container
+    # The upstream-source field is ignored by Charmcraft and Juju, but it can be
+    # useful to developers in identifying the source of the OCI image.  It is also
+    # used by the 'canonical/charming-actions' GitHub action for automated releases.
+    # The test_deploy function in tests/integration/test_charm.py reads upstream-source
+    # to determine which OCI image to use when running the charm's integration tests.
+    upstream-source: ghcr.io/canonical/api_demo_server:1.0.4
