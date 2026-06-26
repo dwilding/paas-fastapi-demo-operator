@@ -12,18 +12,15 @@ import pathlib
 
 import jubilant
 import pytest
-import yaml
 
 logger = logging.getLogger(__name__)
-
-METADATA = yaml.safe_load(pathlib.Path("charmcraft.yaml").read_text())
 
 
 @pytest.mark.juju_setup
 def test_deploy(charm: pathlib.Path, juju: jubilant.Juju):
     """Deploy the charm under test."""
     resources = {
-        "app-image": METADATA["resources"]["app-image"]["upstream-source"]
+        "app-image": "ghcr.io/canonical/api_demo_server:1.0.4"
     }
     juju.deploy(charm, app="paas-fastapi-demo", resources=resources)
     juju.wait(jubilant.all_active)
