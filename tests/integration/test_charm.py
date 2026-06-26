@@ -25,5 +25,5 @@ def test_deploy(charm: pathlib.Path, juju: jubilant.Juju):
     resources = {
         "app-image": METADATA["resources"]["app-image"]["upstream-source"]
     }
-    juju.deploy(charm, app="generic", resources=resources)
+    juju.deploy(charm, app="paas-fastapi-demo", resources=resources)
     juju.wait(jubilant.all_active)
