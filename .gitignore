@@ -1,6 +1,6 @@
 venv/
 build/
-*.charm
+# *.charm
 .tox/
 .coverage
 __pycache__/
