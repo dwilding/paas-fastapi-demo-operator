@@ -19,8 +19,14 @@ logger = logging.getLogger(__name__)
 @pytest.mark.juju_setup
 def test_deploy(charm: pathlib.Path, juju: jubilant.Juju):
     """Deploy the charm under test."""
-    resources = {
-        "app-image": "ghcr.io/canonical/api_demo_server:1.0.4"
-    }
+    resources = {"app-image": "ghcr.io/canonical/api_demo_server:1.0.4"}
     juju.deploy(charm, app="paas-fastapi-demo", resources=resources)
+    juju.wait(jubilant.all_blocked)
+
+
+@pytest.mark.juju_setup
+def test_database_integration(charm: pathlib.Path, juju: jubilant.Juju):
+    """Verify that the charm integrates with the database."""
+    juju.deploy("postgresql-k8s", channel="14/stable", trust=True)
+    juju.integrate("paas-fastapi-demo", "postgresql-k8s")
     juju.wait(jubilant.all_active)
