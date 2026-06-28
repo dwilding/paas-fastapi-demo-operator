@@ -424,6 +424,7 @@ integration = [
     { name = "jubilant" },
     { name = "pytest" },
     { name = "pytest-jubilant" },
+    { name = "pyyaml" },
 ]
 lint = [
     { name = "codespell" },
@@ -454,6 +455,7 @@ integration = [
     { name = "jubilant", specifier = ">=1.8,<2" },
     { name = "pytest" },
     { name = "pytest-jubilant", specifier = ">=2.0.1,<3" },
+    { name = "pyyaml" },
 ]
 lint = [
     { name = "codespell" },

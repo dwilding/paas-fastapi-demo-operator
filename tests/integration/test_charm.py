@@ -7,26 +7,51 @@
 # pytest-jubilant provides a module-scoped `juju` fixture that creates a temporary Juju model.
 # The `charm` fixture is defined in conftest.py.
 
+import json
 import logging
 import pathlib
+import urllib.request
 
 import jubilant
 import pytest
+import yaml
 
 logger = logging.getLogger(__name__)
+
+METADATA = yaml.safe_load(pathlib.Path("charmcraft.yaml").read_text())
+APP_NAME = METADATA["name"]
+OCI_NAME = APP_NAME
 
 
 @pytest.mark.juju_setup
 def test_deploy(charm: pathlib.Path, juju: jubilant.Juju):
     """Deploy the charm under test."""
-    resources = {"app-image": "ghcr.io/canonical/api_demo_server:1.0.4"}
-    juju.deploy(charm, app="paas-fastapi-demo", resources=resources)
+    resources = {"app-image": f"localhost:32000/{OCI_NAME}:latest"}
+    juju.deploy(charm, app=APP_NAME, resources=resources)
     juju.wait(jubilant.all_blocked)
 
 
 @pytest.mark.juju_setup
 def test_database_integration(charm: pathlib.Path, juju: jubilant.Juju):
-    """Verify that the charm integrates with the database."""
+    """Check that the charm integrates with the database."""
     juju.deploy("postgresql-k8s", channel="14/stable", trust=True)
-    juju.integrate("paas-fastapi-demo", "postgresql-k8s")
+    juju.integrate(APP_NAME, "postgresql-k8s")
     juju.wait(jubilant.all_active)
+
+
+def test_workload(charm: pathlib.Path, juju: jubilant.Juju):
+    """Check that the workload functions correctly after integration."""
+    unit_ip = juju.status().apps[APP_NAME].units[f"{APP_NAME}/0"].address
+    api_base = f"http://{unit_ip}:8000"
+    response = urllib.request.urlopen(f"{api_base}/names")
+    assert json.loads(response.read()) == {"names": {}}
+    urllib.request.urlopen(
+        urllib.request.Request(
+            f"{api_base}/addname/",
+            data=b"name=elephant",
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            method="POST",
+        )
+    )
+    response = urllib.request.urlopen(f"{api_base}/names")
+    assert json.loads(response.read()) == {"names": {"1": "elephant"}}
